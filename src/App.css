@@ -1,0 +1,82 @@
+
+.icon-btns {
+    transition: all 0.3s !important;
+    -webkit-transition: all 0.3s !important;
+    -moz-transition: all 0.3s !important;
+    -ms-transition: all 0.3s !important;
+    -o-transition: all 0.3s !important;
+}
+
+.icon-btns:hover {
+    background-color: #c5c5c5 !important;
+    box-shadow: 0 7px 7px rgba(0, 0, 0, 0.4);
+}
+
+.todoCard {
+    transition: all 0.3s !important;
+    -webkit-transition: all 0.2s !important;
+    -moz-transition: all 0.3s !important;
+    -ms-transition: all 0.3s !important;
+    -o-transition: all 0.3s !important;
+}
+
+.todoCard:hover {
+    padding-bottom: 20px;
+    padding-top: 20px;
+    box-shadow: 0 7px 7px rgba(0, 0, 0, 0.4);
+}
+
+/* Custom Fonts */
+@font-face {
+    font-family: Ubuntu;
+    src: url("/public/Fonts/Ubuntu-Regular.ttf");
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url("/public/Fonts/Ubuntu-Italic.ttf");
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url("/public/Fonts/Ubuntu-Light.ttf");
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url("/public/Fonts/Ubuntu-LightItalic.ttf");
+    font-weight: 300;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url("/public/Fonts/Ubuntu-Medium.ttf");
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url("/public/Fonts/Ubuntu-MediumItalic.ttf");
+    font-weight: 500;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url("/public/Fonts/Ubuntu-Bold.ttf");
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url("/public/Fonts/Ubuntu-BoldItalic.ttf");
+    font-weight: 700;
+    font-style: italic;
+}
+
+/* Custom Fonts */
