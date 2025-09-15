@@ -42,7 +42,7 @@ function App() {
   const [todo, setTodo] = useState(initial);
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
-  const [toastSeverity, setToastSeverity] = useState("");
+  const [toastSeverity, setToastSeverity] = useState("success");
 
   function showToast(message = "Action completed!", toastSeverity="success") {
     setMessage(message);
