@@ -1,5 +1,5 @@
 // MainComponent.jsx
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useMemo } from "react";
 import { TodoContext } from "../../Contexts/TodoContext";
 
 import Box from "@mui/material/Box";
@@ -15,30 +15,64 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Task from "../Task/Task";
 import Button from "@mui/material/Button";
 
+// Dialog
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+
 // to create a ID
 import { v4 as createId } from "uuid";
+
+// Toast 
+import { ToastContext } from "../../Contexts/ToastContext";
 
 export default function MainComponent() {
   const { todo, setTodo } = useContext(TodoContext);
   const [titleInput, setTitleInput] = useState("");
   const [displayCategoryBtn, setDisplayCategoryBtn] = useState("all");
+  const [dialogDeleteTodo, setDialogDeleteTodo] = useState(null);
+  const [dialogUpdateTodo, setDialogUpdateTodo] = useState(null);
+
+  // Dialog States
+  const [updateTodo, setUpdateTodo] = useState({ title: "", description: "" });
+  const [showDialogDelete, setShowDialogDelete] = useState(false);
+  const [showDialogUpdate, setShowDialogUpdate] = useState(false);
+
+  // Toast Context
+  let {showToast} = useContext(ToastContext);
 
   // Completed Tasks
-  const completedList = todo.filter((t) => {
-    return t.isCompleted;
-  });
+  const completedList = useMemo(() => {
+    console.log("Completed Task From useMemo");
+    return todo.filter((t) => {
+      return t.isCompleted;
+    });
+  }, [todo]);
+
   //InCompleted Tasks
 
-  const inCompletedList = todo.filter((t) => {
-    return !t.isCompleted;
-  });
+  const inCompletedList = useMemo(() => {
+    console.log("InCompleted Task From useMemo");
+    return todo.filter((t) => {
+      return !t.isCompleted;
+    });
+  }, [todo]);
 
   let TodoToBeRendered = todo;
   if (displayCategoryBtn === "completed") TodoToBeRendered = completedList;
   else if (displayCategoryBtn === "inCompleted")
     TodoToBeRendered = inCompletedList;
 
-  const toDoList = TodoToBeRendered.map((task) => <Task key={task.id} task={task} />);
+  const toDoList = TodoToBeRendered.map((task) => (
+    <Task
+      key={task.id}
+      task={task}
+      handleDelete={handleDelete}
+      handleUpdate={handleUpdate}
+    />
+  ));
   useEffect(() => {
     const storageList = JSON.parse(localStorage.getItem("todo")) || [];
     setTodo(storageList);
@@ -56,14 +90,127 @@ export default function MainComponent() {
     setTodo(update);
     localStorage.setItem("todo", JSON.stringify(update));
     setTitleInput("");
+    showToast("Add Task successfully!");
   }
 
   function handleCategoryBtn(e) {
     setDisplayCategoryBtn(e.target.value);
   }
 
+  function deleteTask() {
+    const updateToDo = todo.filter((t) => t.id !== dialogDeleteTodo.id);
+    setTodo(updateToDo);
+    setShowDialogDelete(false);
+    localStorage.setItem("todo", JSON.stringify(updateToDo));
+    showToast("Task deleted!", "error");
+  }
+
+  function handleDelete(task) {
+    setShowDialogDelete(true);
+    setDialogDeleteTodo(task);
+  }
+
+  function handleUpdate(task) {
+    setShowDialogUpdate(true);
+    setDialogUpdateTodo(task);
+    setUpdateTodo({ title: task.title, description: task.description });
+  }
+
+  function updateTask() {
+    if (updateTodo.title) {
+      const updated = todo.map((t) => {
+        return t.id === dialogUpdateTodo.id
+          ? {
+              ...t,
+              title: updateTodo.title,
+              description: updateTodo.description,
+            }
+          : t;
+      });
+      setTodo(updated);
+      localStorage.setItem("todo", JSON.stringify(updated));
+      setShowDialogUpdate(false);
+      showToast("Task updated!", "info");
+    }
+  }
+
+  
   return (
     <>
+      {/* Start Delete Dialog */}
+      <Dialog
+        onClose={() => setShowDialogDelete(false)}
+        open={showDialogDelete}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Delete Task"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this task: "
+            {dialogDeleteTodo ? dialogDeleteTodo.title : ""}"?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowDialogDelete(false)}>Cancel</Button>
+          <Button autoFocus onClick={deleteTask}>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* End Delete Dialog */}
+
+      {/* Start Update Dialog */}
+      <Dialog
+        onClose={() => {
+          setShowDialogUpdate(false);
+        }}
+        open={showDialogUpdate}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Update Task"}</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            required
+            margin="dense"
+            id="title"
+            name="title"
+            label="Task Title"
+            value={updateTodo.title}
+            type="text"
+            fullWidth
+            variant="standard"
+            onChange={(e) => {
+              setUpdateTodo({ ...updateTodo, title: e.target.value });
+            }}
+          />
+          <TextField
+            autoFocus
+            required
+            margin="dense"
+            id="desc"
+            name="description"
+            label="Task description"
+            value={updateTodo.description}
+            type="text"
+            fullWidth
+            variant="standard"
+            onChange={(e) => {
+              setUpdateTodo({ ...updateTodo, description: e.target.value });
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowDialogUpdate(false)}>Cancel</Button>
+          <Button autoFocus onClick={updateTask}>
+            Done
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* End update Dialog */}
+
       <Container maxWidth="sm">
         <Card sx={{ minWidth: 275 }}>
           <CardContent>
@@ -85,16 +232,10 @@ export default function MainComponent() {
               <ToggleButton value="all" aria-label="left aligned">
                 All
               </ToggleButton>
-              <ToggleButton
-                value="completed"
-                aria-label="centered"
-              >
+              <ToggleButton value="completed" aria-label="centered">
                 Complete
               </ToggleButton>
-              <ToggleButton
-                value="inCompleted"
-                aria-label="right aligned"
-              >
+              <ToggleButton value="inCompleted" aria-label="right aligned">
                 Incomplete
               </ToggleButton>
             </ToggleButtonGroup>
