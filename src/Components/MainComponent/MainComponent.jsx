@@ -1,6 +1,5 @@
 // MainComponent.jsx
-import { useState, useContext, useEffect, useMemo } from "react";
-import { TodoContext } from "../../Contexts/TodoContext";
+import { useState, useEffect, useMemo } from "react";
 
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -22,14 +21,13 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
-// to create a ID
-import { v4 as createId } from "uuid";
+// Toast
+import { useToast } from "../../Contexts/ToastContext";
 
-// Toast 
-import { ToastContext } from "../../Contexts/ToastContext";
+// Todos Context
+import { useTodo, useDispatch } from "../../Contexts/TodoContext";
 
 export default function MainComponent() {
-  const { todo, setTodo } = useContext(TodoContext);
   const [titleInput, setTitleInput] = useState("");
   const [displayCategoryBtn, setDisplayCategoryBtn] = useState("all");
   const [dialogDeleteTodo, setDialogDeleteTodo] = useState(null);
@@ -40,8 +38,12 @@ export default function MainComponent() {
   const [showDialogDelete, setShowDialogDelete] = useState(false);
   const [showDialogUpdate, setShowDialogUpdate] = useState(false);
 
+  // refactor the coed with useReducer
+  const todo  = useTodo();
+  const dispatch = useDispatch();
+
   // Toast Context
-  let {showToast} = useContext(ToastContext);
+  let { showToast } = useToast();
 
   // Completed Tasks
   const completedList = useMemo(() => {
@@ -73,22 +75,20 @@ export default function MainComponent() {
       handleUpdate={handleUpdate}
     />
   ));
+
   useEffect(() => {
-    const storageList = JSON.parse(localStorage.getItem("todo")) || [];
-    setTodo(storageList);
+    dispatch({
+      type: "getFormLocalStorage",
+    });
   }, []);
 
   function addTask() {
-    if (!titleInput.trim()) return;
-    const newTask = {
-      id: createId(),
-      title: titleInput.trim(),
-      description: "",
-      isCompleted: false,
-    };
-    const update = [...todo, newTask];
-    setTodo(update);
-    localStorage.setItem("todo", JSON.stringify(update));
+    dispatch({
+      type: "addedTask",
+      payload: {
+        titleInput,
+      },
+    });
     setTitleInput("");
     showToast("Add Task successfully!");
   }
@@ -98,10 +98,8 @@ export default function MainComponent() {
   }
 
   function deleteTask() {
-    const updateToDo = todo.filter((t) => t.id !== dialogDeleteTodo.id);
-    setTodo(updateToDo);
+    dispatch({ type: "deletedTask", payload: { ID: dialogDeleteTodo.id } });
     setShowDialogDelete(false);
-    localStorage.setItem("todo", JSON.stringify(updateToDo));
     showToast("Task deleted!", "error");
   }
 
@@ -118,23 +116,18 @@ export default function MainComponent() {
 
   function updateTask() {
     if (updateTodo.title) {
-      const updated = todo.map((t) => {
-        return t.id === dialogUpdateTodo.id
-          ? {
-              ...t,
-              title: updateTodo.title,
-              description: updateTodo.description,
-            }
-          : t;
+      dispatch({
+        type: "updatedTask",
+        payload: {
+          updateTodo,
+          ID: dialogUpdateTodo.id,
+        },
       });
-      setTodo(updated);
-      localStorage.setItem("todo", JSON.stringify(updated));
       setShowDialogUpdate(false);
       showToast("Task updated!", "info");
     }
   }
 
-  
   return (
     <>
       {/* Start Delete Dialog */}

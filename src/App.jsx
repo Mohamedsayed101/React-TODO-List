@@ -1,36 +1,9 @@
 // App.jsx
-import { useState } from "react";
 import "./App.css";
 import MainComponent from "./Components/MainComponent/MainComponent";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { TodoContext } from "./Contexts/TodoContext";
-import { ToastContext } from "./Contexts/ToastContext";
-import Alerts from "./Components/Alerts/Alerts";
-
-// to create a ID
-import { v4 as createId } from "uuid";
-// Toast States
-
-const initial = [
-  {
-    id: createId(),
-    title: "Task One",
-    description: "This is Task One",
-    isCompleted: false,
-  },
-  {
-    id: createId(),
-    title: "Task Two",
-    description: "This is Task Two",
-    isCompleted: false,
-  },
-  {
-    id: createId(),
-    title: "Task Three",
-    description: "This is Task Three",
-    isCompleted: false,
-  },
-];
+import { ToastProvider } from "./Contexts/ToastContext";
+import TodoProvider  from "./Contexts/TodoContext";
 
 const theme = createTheme({
   typography: {
@@ -39,23 +12,10 @@ const theme = createTheme({
 });
 
 function App() {
-  const [todo, setTodo] = useState(initial);
-  const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const [toastSeverity, setToastSeverity] = useState("success");
-
-  function showToast(message = "Action completed!", toastSeverity="success") {
-    setMessage(message);
-    setToastSeverity(toastSeverity);
-    setOpen(true);
-    setTimeout(() => {
-      setOpen(false);
-    }, 2000);
-  }
   return (
     <>
       <ThemeProvider theme={theme}>
-        <ToastContext.Provider value={{ showToast }}>
+        <ToastProvider>
           <div
             style={{
               width: "100%",
@@ -67,16 +27,11 @@ function App() {
               textAlign: "center",
             }}
           >
-            <TodoContext.Provider value={{ todo, setTodo }}>
+            <TodoProvider>
               <MainComponent />
-              <Alerts
-                open={open}
-                message={message}
-                toastSeverity={toastSeverity}
-              />
-            </TodoContext.Provider>
+            </TodoProvider>
           </div>
-        </ToastContext.Provider>
+        </ToastProvider>
       </ThemeProvider>
     </>
   );

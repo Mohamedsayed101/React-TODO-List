@@ -1,6 +1,4 @@
 // Task.jsx
-import { useContext } from "react";
-import { TodoContext } from "../../Contexts/TodoContext";
 
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -14,14 +12,15 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 // Toast
-import { ToastContext } from "../../Contexts/ToastContext";
+import { useToast } from "../../Contexts/ToastContext";
+import { useDispatch } from "../../Contexts/TodoContext";
 
 export default function Task({ task, handleDelete, handleUpdate }) {
-  const { todo, setTodo } = useContext(TodoContext);
+  const dispatch = useDispatch();
   const title = task.title;
   const desc = task.description;
 
-  const { showToast } = useContext(ToastContext);
+  const { showToast } = useToast();
 
   return (
     <div>
@@ -60,19 +59,18 @@ export default function Task({ task, handleDelete, handleUpdate }) {
                   border: "solid 3px #8bc34a",
                 }}
                 onClick={() => {
-                  const updateToDo = todo.map((t) =>
-                    t.id === task.id ? { ...t, isCompleted: !t.isCompleted } : t
-                  );
-                  setTodo(updateToDo);
-
+                  dispatch({
+                    type: "CheckedTask",
+                    payload: {
+                      task,
+                    },
+                  });
                   // لو بقى Completed
                   if (!task.isCompleted) {
                     showToast("Task marked as completed ✅", "success");
                   } else {
                     showToast("Task marked as inCompleted ❌", "warning");
                   }
-
-                  localStorage.setItem("todo", JSON.stringify(updateToDo));
                 }}
               >
                 <CheckIcon />
