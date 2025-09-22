@@ -13,10 +13,20 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 
 // Toast
 import { useToast } from "../../Contexts/ToastContext";
-import { useDispatch } from "../../Contexts/TodoContext";
+
+// Reducer Code
+// import { useDispatch } from "../../Contexts/TodoContext";
+
+// Redux Code
+import { checkedTodoTask } from "../../Features/TodoSlice/TodoSlice";
+import { useDispatch } from "react-redux";
 
 export default function Task({ task, handleDelete, handleUpdate }) {
+  // const dispatch = useDispatch();
+
+  // Redux code
   const dispatch = useDispatch();
+
   const title = task.title;
   const desc = task.description;
 
@@ -59,12 +69,12 @@ export default function Task({ task, handleDelete, handleUpdate }) {
                   border: "solid 3px #8bc34a",
                 }}
                 onClick={() => {
-                  dispatch({
-                    type: "CheckedTask",
-                    payload: {
-                      task,
-                    },
-                  });
+                  // dispatch({
+                  //   type: "CheckedTask",
+                  //   payload: {
+                  //     task,
+                  //   },
+                  dispatch(checkedTodoTask({ id: task.id }));
                   // لو بقى Completed
                   if (!task.isCompleted) {
                     showToast("Task marked as completed ✅", "success");

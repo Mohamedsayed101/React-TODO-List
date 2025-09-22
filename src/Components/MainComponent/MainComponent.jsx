@@ -25,7 +25,16 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { useToast } from "../../Contexts/ToastContext";
 
 // Todos Context
-import { useTodo, useDispatch } from "../../Contexts/TodoContext";
+// import { useTodo, useDispatch } from "../../Contexts/TodoContext";
+
+// Redux Code
+import { useSelector, useDispatch } from "react-redux";
+import {
+  addTodoTask,
+  deleteTodoTask,
+  updateTodoTask,
+  getFormLocalStorage,
+} from "../../Features/TodoSlice/TodoSlice";
 
 export default function MainComponent() {
   const [titleInput, setTitleInput] = useState("");
@@ -39,15 +48,22 @@ export default function MainComponent() {
   const [showDialogUpdate, setShowDialogUpdate] = useState(false);
 
   // refactor the coed with useReducer
-  const todo  = useTodo();
+  // const todo = useTodo();
+  // const dispatch = useDispatch();
+
+  // Redux Code
+  const todo = useSelector((state) => state.todo.Todo);
   const dispatch = useDispatch();
+
+  console.log("----------".repeat(3));
+  console.log(todo, dispatch);
+  console.log("----------".repeat(3));
 
   // Toast Context
   let { showToast } = useToast();
 
   // Completed Tasks
   const completedList = useMemo(() => {
-    console.log("Completed Task From useMemo");
     return todo.filter((t) => {
       return t.isCompleted;
     });
@@ -56,7 +72,6 @@ export default function MainComponent() {
   //InCompleted Tasks
 
   const inCompletedList = useMemo(() => {
-    console.log("InCompleted Task From useMemo");
     return todo.filter((t) => {
       return !t.isCompleted;
     });
@@ -77,18 +92,22 @@ export default function MainComponent() {
   ));
 
   useEffect(() => {
-    dispatch({
-      type: "getFormLocalStorage",
-    });
+    // dispatch({
+    //   type: "getFormLocalStorage",
+    // });
+
+    dispatch(getFormLocalStorage());
   }, []);
 
   function addTask() {
-    dispatch({
-      type: "addedTask",
-      payload: {
-        titleInput,
-      },
-    });
+    // dispatch({
+    //   type: "addedTask",
+    //   payload: {
+    //     titleInput,
+    //   },
+    // });
+
+    dispatch(addTodoTask(titleInput));
     setTitleInput("");
     showToast("Add Task successfully!");
   }
@@ -98,7 +117,8 @@ export default function MainComponent() {
   }
 
   function deleteTask() {
-    dispatch({ type: "deletedTask", payload: { ID: dialogDeleteTodo.id } });
+    // dispatch({ type: "deletedTask", payload: { ID: dialogDeleteTodo.id } });
+    dispatch(deleteTodoTask({ ID: dialogDeleteTodo.id }));
     setShowDialogDelete(false);
     showToast("Task deleted!", "error");
   }
@@ -116,13 +136,15 @@ export default function MainComponent() {
 
   function updateTask() {
     if (updateTodo.title) {
-      dispatch({
-        type: "updatedTask",
-        payload: {
-          updateTodo,
-          ID: dialogUpdateTodo.id,
-        },
-      });
+      // dispatch({
+      //   type: "updatedTask",
+      //   payload: {
+      //     updateTodo,
+      //     ID: dialogUpdateTodo.id,
+      //   },
+      // });
+
+      dispatch(updateTodoTask({ updateTodo, ID: dialogUpdateTodo.id }));
       setShowDialogUpdate(false);
       showToast("Task updated!", "info");
     }
