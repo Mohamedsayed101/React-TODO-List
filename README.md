@@ -20,6 +20,7 @@ It ensures a **consistent, reusable, and global** way to handle success, error, 
 - **Context API** → Global state management for sharing the `showToast` function.  
 - **UUID** → For unique task identifiers.  
 - **LocalStorage** → To persist tasks and their states across sessions.  
+- **Redux** -> in case more scale for project but in this version isn't important
 
 ---
 
@@ -28,6 +29,7 @@ It ensures a **consistent, reusable, and global** way to handle success, error, 
 - **Provider Wrapper**: Wraps the entire app to share toast state globally.  
 - **Alerts Component**: Handles rendering of notifications using Material UI’s Snackbar + Alert.  
 - **Consumer Components**: Trigger notifications by calling `showToast`.  
+- **Store for Redux States** That contain Todo state that give me option to add ,delete,update,checkCompleted and store this updates in Local Storage
 
 ---
 
